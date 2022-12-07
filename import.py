@@ -1,7 +1,7 @@
 import pandas as pd
 import plotly.express as px
 
-def main():
+def loadEthData():
     dfEth = pd.read_csv("../priceHistories/ETHUSD.csv")
     dfEth['timestamp'] = pd.to_datetime(dfEth['timestamp'], unit='s')
     dfEth['date'] = dfEth['timestamp'].dt.date
@@ -10,19 +10,26 @@ def main():
     
     dfEth = dfEth.rename(columns={'timestamp':'Date','open':'EthOpen'})
     dfEth.sort_values(by = 'Date', ascending=True, inplace=True)
-    print(dfEth)
+    return(dfEth)
+
+def loadBtcData():
     dfBTC = pd.read_csv("../priceHistories/BTCUSD.csv")
     dfBTC['Date'] = pd.to_datetime(dfBTC['Date'])
     # dfBTC.sort_values(by = 'Date', ascending=False, inplace=True)
     dfBTC = dfBTC.rename(columns={'Open':'BTCOpen'})
-    print(dfBTC)
+    return(dfBTC)
 
-    dfEth = dfEth[['Date', 'EthOpen']]
-    dfBTC = dfBTC[['Date', "BTCOpen"]]
+def createPricesDataFrame():
+    dfEth = loadEthData()[['Date', 'EthOpen']]
+    dfBTC = loadBtcData()[['Date', 'BTCOpen']]
 
-    dfPrices = pd.merge(dfEth, dfBTC, on = 'Date')
-    dfPrices.sort_values(by = 'Date', ascending=True, inplace = True)
+    Prices = pd.merge(dfEth, dfBTC, on = 'Date')
+    Prices.sort_values(by = 'Date', ascending=True, inplace = True)
+    return Prices
 
+def main():
+
+    dfPrices = createPricesDataFrame()
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% #
     REBALANCEFREQ = 1 # how regularly portfolio is balanced, measured in days
     TARGETBTCPROPORTION = 0.5
