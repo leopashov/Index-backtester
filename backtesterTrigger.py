@@ -92,8 +92,8 @@ def displayFigures(priceData, hold, equalHold, rebal, btcTarget, rebalanceFreq):
     
 
 def main():
-    targetBtcWeight = 0.44
-    rebalanceTrigger = 0.001 # percent -> 0.1 = 10% 
+    targetBtcWeight = 0.42
+    rebalanceTrigger = 0.41 # percent -> 0.1 = 10% 
     prices = createPricesDataFrame()
 
     holdReturns = getHoldReturns(prices)
