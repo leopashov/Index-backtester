@@ -48,7 +48,7 @@ def writeRemainderOfRow(array, row, prices):
     array[row, 5] = array[row, 3] / array[row, 4]
 
 
-def getRebalancedReturns(priceData, targetBtcWeight, rebalanceFrequency):
+def getRebalancedReturns(priceData, targetBtcWeight, rebalanceTrigger):
     # create numpy array of length price data (rows correspond to dates)
     # using numpy as will have to iterate through
     a = np.zeros((len(priceData), 6))
@@ -58,12 +58,12 @@ def getRebalancedReturns(priceData, targetBtcWeight, rebalanceFrequency):
     writeRemainderOfRow(a, 0, priceData)
 
     for i in range(1,len(a)):
-        if i % rebalanceFrequency == 0:
+        btcValue = a[i-1, 1] * priceData.BTC[i]
+        ethValue = a[i-1, 0] * priceData.ETH[i]
+        totalValue = btcValue + ethValue
+        btcWeight = btcValue/totalValue
+        if abs(btcWeight - targetBtcWeight) > rebalanceTrigger:
             #rebalance
-            btcValue = a[i-1, 1] * priceData.BTC[i]
-            ethValue = a[i-1, 0] * priceData.ETH[i]
-            totalValue = btcValue + ethValue
-            btcWeight = btcValue/totalValue
             btcToSell = ((btcWeight-targetBtcWeight)*totalValue)/priceData.BTC[i]
             ethToBuy = ((btcWeight-targetBtcWeight)*totalValue)/priceData.ETH[i]
             a[i, 1] = a[i-1, 1] - btcToSell
@@ -81,7 +81,7 @@ def displayFigures(priceData, hold, equalHold, rebal, btcTarget, rebalanceFreq):
     fig1 = px.line(priceData, title="eth-usd and btc-usd price history")
     fig1.show()
 
-    fig2Title = 'returns - BtcWeight: {weight}, rebalance frequency: {freq}'.format(weight = btcTarget, freq = rebalanceFreq)
+    fig2Title = 'returns - BtcWeight: {weight}, rebalance trigger: {freq} percent'.format(weight = btcTarget, freq = rebalanceFreq*100)
     print(fig2Title)
     fig2 = px.line(hold, title = fig2Title)
     fig2.add_trace(go.Scatter(x = equalHold.index, y = equalHold, mode="lines", name = '50/50 hold', showlegend = True))
@@ -92,15 +92,15 @@ def displayFigures(priceData, hold, equalHold, rebal, btcTarget, rebalanceFreq):
     
 
 def main():
-    targetBtcWeight = 0.45
-    rebalanceFrequency = 136 #days
+    targetBtcWeight = 0.44
+    rebalanceTrigger = 0.001 # percent -> 0.1 = 10% 
     prices = createPricesDataFrame()
 
     holdReturns = getHoldReturns(prices)
     equalHoldReturns = getEqualSplitHoldings(prices, holdReturns)
-    rebalArray = getRebalancedReturns(prices, targetBtcWeight, rebalanceFrequency)
+    rebalArray = getRebalancedReturns(prices, targetBtcWeight, rebalanceTrigger)
 
-    displayFigures(prices, holdReturns, equalHoldReturns, rebalArray, targetBtcWeight, rebalanceFrequency)    
+    displayFigures(prices, holdReturns, equalHoldReturns, rebalArray, targetBtcWeight, rebalanceTrigger)    
 
 
 if __name__ == "__main__":
