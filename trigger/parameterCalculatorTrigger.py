@@ -12,17 +12,17 @@ def getMaxReturns(priceData):
     maxReturns = pd.DataFrame(index = triggerRange, columns = weightsRange)
     # maxReturns = np.zeros(len(weightsRange)*len(triggerRange),3)
     i = 0
-    for rebalanceFrequency in triggerRange:
+    for trigger in triggerRange:
         for targetBtcWeight in weightsRange:
-            maxReturns.at[rebalanceFrequency,targetBtcWeight] = btT.getRebalancedReturns(priceData, targetBtcWeight, rebalanceFrequency)[:, 4].max()
+            maxReturns.at[trigger,targetBtcWeight] = btT.getRebalancedReturns(priceData, targetBtcWeight, trigger)[:, 4].max()
             print(f'completed: ',i,'of', runs, 'calculations')
             i+=1
     maxReturns.to_pickle("./maxReturnsTrigger")
     return maxReturns
 
-def getPeaksAndTroughs(priceData, targetBtcWeight, rebalanceFrequency):
+def getPeaksAndTroughs(priceData, targetBtcWeight, trigger):
     # get peaks and troughs of one sim (1 set of weighting and rebal frequency)
-    rets = btT.getRebalancedReturns(priceData, targetBtcWeight, rebalanceFrequency)[:, 4]
+    rets = btT.getRebalancedReturns(priceData, targetBtcWeight, trigger)[:, 4]
     peaks = signal.find_peaks(rets)
     print(peaks)
     troughs = signal.find_peaks(-rets)
@@ -30,7 +30,7 @@ def getPeaksAndTroughs(priceData, targetBtcWeight, rebalanceFrequency):
 
 def printMaxReturnsSurfacePlot(maxReturnsDf):
     fig = go.Figure(data=[go.Surface(z=maxReturnsDf)])
-    fig.update_layout(title = 'max returns, weight and rebalance frequency variables')
+    fig.update_layout(title = 'max returns, weight(x) and trigger size (y) variables')
     fig.show()
 
 
@@ -40,7 +40,7 @@ def main():
 
     # print(prices)
     
-    # rebalTotVals = bt.getRebalancedReturns(prices, targetBtcWeight, rebalanceFrequency)[:, 4]
+    # rebalTotVals = bt.getRebalancedReturns(prices, targetBtcWeight, trigger)[:, 4]
     maxReturnsDf = getMaxReturns(prices)
     printMaxReturnsSurfacePlot(maxReturnsDf)
 
