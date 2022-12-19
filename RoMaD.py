@@ -1,5 +1,5 @@
 import backtester as bt
-import parameterCalculator as pc
+import backtesting.scripts.frequencyRebalance.parameterCalculator as pc
 import drawdownCalculation as dc
 import plotly.graph_objects as go
 import pandas as pd

@@ -3,7 +3,7 @@ effect of btc weight. Here we look to see if there is any correlation between th
 Highets returns were acheived when rebalancing every 136 days"""
 
 import backtester as bt
-import backtesterTrigger as btT
+import backtesting.scripts.trigger.backtesterTrigger as btT
 import pandas as pd
 import plotly.express as px
 import datetime

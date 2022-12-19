@@ -1,4 +1,4 @@
-import backtesterTrigger as btT
+import backtesting.scripts.trigger.backtesterTrigger as btT
 import backtester as bt
 import numpy as np
 import pandas as pd
